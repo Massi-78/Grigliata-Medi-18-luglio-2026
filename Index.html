@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grigliata ai Medi del 18 luglio 2026</title>
+    <style>
+        /* --- STILE GENERALE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #loginScreen {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .container {
+            display: none; /* Nascosto all'inizio */
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #d35400; /* Colore brace */
+            margin-bottom: 10px;
+            font-size: 2.3rem;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* --- BOTTONI --- */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #219a52;
+        }
+
+        .btn-secondary {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2c3e50;
+        }
+
+        /* --- MODALI (POP-UP FORM) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            text-align: left;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #95a5a6;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .error-message {
+            color: #c0392b;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Scelte Menu Cibo per bambini */
+        .menu-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-menu {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+            background-color: #f1f2f6;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-menu:hover {
+            background-color: #e4e7eb;
+        }
+
+        /* --- SEZIONE INVITATI --- */
+        .guests-section {
+            display: none;
+            margin-top: 25px;
+            text-align: left;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+
+        .guests-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .guests-section h3 {
+            color: #333;
+        }
+
+        .total-badge {
+            background-color: #e67e22;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .guest-list {
+            list-style: none;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .guest-list li {
+            padding: 10px;
+            background-color: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-left: 4px solid #d35400;
+        }
+
+        .guest-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+
+        .guest-name {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .plus-badge {
+            background-color: #7f8c8d;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .guest-details {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .child-menu-info {
+            font-size: 0.8rem;
+            color: #27ae60;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .special-requests-info {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCHERMATA DI ACCESSO CON PASSWORD -->
+    <div id="loginScreen">
+        <h2 style="margin-bottom: 10px; color: #333;">Area Riservata 🔒</h2>
+        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 0.95rem;">Inserisci la password dell'evento per accedere alla lista della grigliata.</p>
+        <form onsubmit="verificaPassword(event)">
+            <div class="form-group">
+                <input type="password" id="passwordInput" placeholder="Inserisci la password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Accedi</button>
+            <p id="loginError" class="error-message">Password errata! Riprova.</p>
+        </form>
+    </div>
+
+    <!-- CONTENITORE APPLICAZIONE PRINCIPALE -->
+    <div class="container" id="mainContainer">
+
+    <!-- IMMAGINE INSERITA QUI -->
+    <img src="C:\Users\massi\Desktop\260705_Grigliata Medi\IMG-20260614-WA0013.jpg" 
+         style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;">
+        <h1>Grigliata ai Medi del 18 luglio 2026 🍖</h1>
+        <p class="subtitle">Organizziamo la festa! Conferma la tua presenza qui sotto.</p>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="toggleModal(true)">Candidati alla festa</button>
+            <button class="btn btn-secondary" id="toggleBtn" onclick="toggleGuests()">Mostra i candidati</button>
+        </div>
+
+        <!-- Sezione Invitati Dinamica -->
+        <div class="guests-section" id="guestsSection">
+            <div class="guests-header">
+                <h3>Lista Invitati</h3>
+                <span class="total-badge" id="totalCounter">Adulti: 0 | Bambini: 0</span>
+            </div>
+            <ul class="guest-list" id="guestList">
+                <!-- I partecipanti appariranno qui -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Modulo Pop-up 1: Candidatura principale -->
+    <div class="modal" id="candidateModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleModal(false)">&times;</span>
+            <h2>Candidati</h2>
+            <form id="candidateForm" onsubmit="gestisciInvioForm(event)">
+                
+                <div class="form-group">
+                    <label for="name">Il tuo nome:</label>
+                    <input type="text" id="name" required placeholder="Es. Marco Rossi">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adults">Adulti (te incluso):</label>
+                        <input type="number" id="adults" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="children">Bambini:</label>
+                        <input type="number" id="children" min="0" value="0" required>
+                    </div>
+                </div>
+
+                <!-- NUOVO CAMPO RICHIESTE SPECIALI -->
+                <div class="form-group">
+                    <label for="specialRequests">Richieste speciali:</label>
+                    <input type="text" id="specialRequests" placeholder="solo cose legali">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Avanti</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modulo Pop-up 2: Scelta cibo bambini -->
+    <div class="modal" id="childMenuModal">
+        <div class="modal-content">
+            <h2 id="childMenuTitle">Menu Bambino 1</h2>
+            <p style="color: #555; margin-bottom: 10px;">Scegli il piatto principale:</p>
+            <div class="menu-options">
+                <button class="btn-menu" onclick="scegliMenuBambino('Hamburger')">🍔 Hamburger</button>
+                <button class="btn-menu" onclick="scegliMenuBambino('Hot Dog')">🌭 Hot Dog</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- --- LOGICA DELLA PAGINA (JAVASCRIPT) --- -->
+    <script>
+        // PASSWORD DI ACCESSO
+        const PASSWORD_CORRETTA = "medi2026";
+
+        const datiIniziali = [
+            { nome: "Mario Rossi", adulti: 2, bambini: 1, menu_bambini: "1x Hamburger", richieste: "Intollerante al lattosio" },
+            { nome: "Giulia Bianchi", adulti: 1, bambini: 0, menu_bambini: "", richieste: "Vegetariana" },
+            { nome: "Luca Verdi", adulti: 2, bambini: 2, menu_bambini: "1x Hamburger, 1x Hot Dog", richieste: "" }
+        ];
+
+        let partecipanti = JSON.parse(localStorage.getItem('partecipantiGrigliata')) || datiIniziali;
+
+        let datiTemporanei = {};
+        let bambiniDaProcessare = 0;
+        let bambinoCorrenteIndex = 0;
+        let choicesMenuBambini = [];
+
+        if (localStorage.getItem('grigliataAutenticato') === 'true') {
+            mostraApplicazione();
+        }
+
+        function verificaPassword(event) {
+            event.preventDefault();
+            const input = document.getElementById('passwordInput').value;
+            const errore = document.getElementById('loginError');
+
+            if (input === PASSWORD_CORRETTA) {
+                localStorage.setItem('grigliataAutenticato', 'true');
+                mostraApplicazione();
+            } else {
+                errore.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function mostraApplicazione() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            aggiornaInterfaccia();
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('candidateModal');
+            modal.style.display = show ? 'flex' : 'none';
+            if(show) {
+                document.getElementById('candidateForm').reset();
+                document.getElementById('adults').value = 1;
+                document.getElementById('children').value = 0;
+                document.getElementById('specialRequests').value = '';
+            }
+        }
+
+        function toggleGuests() {
+            const section = document.getElementById('guestsSection');
+            const btn = document.getElementById('toggleBtn');
+            
+            if (section.style.display === 'none' || section.style.display === '') {
+                section.style.display = 'block';
+                btn.textContent = 'Nascondi i candidati';
+            } else {
+                section.style.display = 'none';
+                btn.textContent = 'Mostra i candidati';
+            }
+        }
+
+        function gestisciInvioForm(event) {
+            event.preventDefault();
+            
+            datiTemporanei = {
+                nome: document.getElementById('name').value.trim(),
+                adulti: parseInt(document.getElementById('adults').value, 10),
+                bambini: parseInt(document.getElementById('children').value, 10),
+                richieste: document.getElementById('specialRequests').value.trim()
+            };
+
+            bambiniDaProcessare = datiTemporanei.bambini;
+            
+            if (bambiniDaProcessare > 0) {
+                toggleModal(false);
+                bambinoCorrenteIndex = 1;
+                choicesMenuBambini = [];
+                mostraPopupMenuBambino();
+            } else {
+                toggleModal(false);
+                salvaCandidaturaFinale("");
+            }
+        }
+
+        function mostraPopupMenuBambino() {
+            document.getElementById('childMenuTitle').textContent = `Menu per il Bambino ${bambinoCorrenteIndex} di ${bambiniDaProcessare}`;
+            document.getElementById('childMenuModal').style.display = 'flex';
+        }
+
+        function scegliMenuBambino(scelta) {
+            choicesMenuBambini.push(scelta);
+            
+            if (bambinoCorrenteIndex < bambiniDaProcessare) {
+                bambinoCorrenteIndex++;
+                mostraPopupMenuBambino();
+            } else {
+                document.getElementById('childMenuModal').style.display = 'none';
+                
+                const conteggio = choicesMenuBambini.reduce((acc, curr) => {
+                    acc[curr] = (acc[curr] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const testoMenu = Object.entries(conteggio)
+                    .map(([piatto, qta]) => `${qta}x ${piatto}`)
+                    .join(', ');
+
+                salvaCandidaturaFinale(testoMenu);
+            }
+        }
+
+        function salvaCandidaturaFinale(testoMenu) {
+            partecipanti.push({ 
+                nome: datiTemporanei.nome, 
+                adulti: datiTemporanei.adulti, 
+                bambini: datiTemporanei.bambini,
+                menu_bambini: testoMenu,
+                richieste: datiTemporanei.richieste
+            });
+            
+            localStorage.setItem('partecipantiGrigliata', JSON.stringify(partecipanti));
+            datiTemporanei = {};
+            
+            aggiornaInterfaccia();
+
+            const section = document.getElementById('guestsSection');
+            if (section.style.display !== 'block') {
+                toggleGuests();
+            }
+        }
+
+        function aggiornaInterfaccia() {
+            const listaUl = document.getElementById('guestList');
+            const contatoreTotale = document.getElementById('totalCounter');
+            
+            listaUl.innerHTML = '';
+
+            let totaleAdulti = 0;
+            let totaleBambini = 0;
+            let totaleHamburger = 0;
+            let totaleHotDog = 0;
+
+            partecipanti.forEach(p => {
+                totaleAdulti += p.adulti;
+                totaleBambini += p.bambini;
+
+                if (p.menu_bambini) {
+                    if (p.menu_bambini.includes('Hamburger')) {
+                        const match = p.menu_bambini.match(/(\d+)x Hamburger/);
+                        if(match) totaleHamburger += parseInt(match[1], 10);
+                    }
+                    if (p.menu_bambini.includes('Hot Dog')) {
+                        const match = p.menu_bambini.match(/(\d+)x Hot Dog/);
+                        if(match) totaleHotDog += parseInt(match[1], 10);
+                    }
+                }
+
+                const extraTotali = (p.adulti - 1) + p.bambini;
+                const badgeExtra = extraTotali > 0 ? `<span class="plus-badge">+${extraTotali}</span>` : '';
+
+                const li = document.createElement('li');
+                
+                const dettagliAdulti = p.adulti === 1 ? "1 Adulto" : `${p.adulti} Adulti`;
+                const dettagliBambini = p.bambini === 0 ? "" : (p.bambini === 1 ? ", 1 Bambino" : `, ${p.bambini} Bambini`);
+                
+                const infoMenu = p.menu_bambini ? `<div class="child-menu-info">👶 Menu: ${p.menu_bambini}</div>` : '';
+                
+                // Gestione visiva delle richieste speciali nella lista
+                const infoRichieste = p.richieste ? `<div class="special-requests-info">📝 Note: ${p.richieste}</div>` : '';
+                
+                li.innerHTML = `
+                    <div class="guest-row-top">
+                        <span class="guest-name">${p.nome} ${badgeExtra}</span> 
+                        <span class="guest-details">${dettagliAdulti}${dettagliBambini}</span>
+                    </div>
+                    ${infoMenu}
+                    ${infoRichieste}
+                `;
+                listaUl.appendChild(li);
+            });
+
+            let riepilogo = `Adulti: ${totaleAdulti} | Bambini: ${totaleBambini}`;
+            if (totaleHamburger > 0 || totaleHotDog > 0) {
+                riepilogo += ` (🍔 ${totaleHamburger} | 🌭 ${totaleHotDog})`;
+            }
+            contatoreTotale.textContent = riepilogo;
+        }
+    </script>
+</body>
+</html>
