@@ -486,25 +486,51 @@
             }
         }
 
-        function salvaCandidaturaFinale(testoMenu) {
-            partecipanti.push({ 
-                nome: datiTemporanei.nome, 
-                adulti: datiTemporanei.adulti, 
-                bambini: datiTemporanei.bambini,
-                menu_bambini: testoMenu,
-                richieste: datiTemporanei.richieste
-            });
-            
-            localStorage.setItem('partecipantiGrigliata', JSON.stringify(partecipanti));
-            datiTemporanei = {};
-            
-            aggiornaInterfaccia();
+function salvaCandidaturaFinale(testoMenu) {
+    const datiSalvataggio = { 
+        nome: datiTemporanei.nome, 
+        adulti: datiTemporanei.adulti, 
+        bambini: datiTemporanei.bambini,
+        menu_bambini: testoMenu,
+        richieste: datiTemporanei.richieste
+    };
 
-            const section = document.getElementById('guestsSection');
-            if (section.style.display !== 'block') {
-                toggleGuests();
-            }
-        }
+    let tipoOperazione = "Nuova Candidatura";
+
+    if (indiceDaModificare !== -1) {
+        partecipanti[indiceDaModificare] = datiSalvataggio;
+        tipoOperazione = "Modifica Candidatura 🔄";
+        alert("I tuoi dati sono stati modificati con successo! Ora ti reindirizziamo a WhatsApp per notificare l'organizzatore. 👍");
+    } else {
+        partecipanti.push(datiSalvataggio);
+        alert("Grazie per esserti candidato! Ora ti reindirizziamo a WhatsApp per notificare l'organizzatore. 🍖");
+    }
+    
+    localStorage.setItem('partecipantiGrigliata', JSON.stringify(partecipanti));
+    
+    // --- INVIO NOTIFICA WHATSAPP ---
+    const TUO_NUMERO = "+393356412440"; // ⚠️ SOSTITUISCI CON IL TUO NUMERO REALE (Es. 39 + numero)
+    
+    let testoMessaggio = `*${tipoOperazione}*\n`;
+    testoMessaggio += `👤 *Nome:* ${datiSalvataggio.nome}\n`;
+    testoMessaggio += `👨 *Adulti:* ${datiSalvataggio.adulti}\n`;
+    testoMessaggio += `👶 *Bambini:* ${datiSalvataggio.bambini}\n`;
+    if(datiSalvataggio.menu_bambini) {
+        testoMessaggio += `🍔 *Menu Bimbi:* ${datiSalvataggio.menu_bambini}\n`;
+    }
+    if(datiSalvataggio.richieste) {
+        testoMessaggio += `📝 *Note:* ${datiSalvataggio.richieste}\n`;
+    }
+
+    // Crea il link ufficiale di WhatsApp ed esegue il reindirizzamento
+    const urlWhatsApp = `https://api.whatsapp.com/send?phone=${TUO_NUMERO}&text=${encodeURIComponent(testoMessaggio)}`;
+    window.location.href = urlWhatsApp;
+    
+    // Reset dello stato
+    datiTemporanei = {};
+    indiceDaModificare = -1;
+    aggiornaInterfaccia();
+}
 
         function aggiornaInterfaccia() {
             const listaUl = document.getElementById('guestList');
@@ -565,4 +591,3 @@
     </script>
 </body>
 </html>
-
